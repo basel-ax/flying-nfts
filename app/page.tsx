@@ -1,3 +1,4 @@
+"use client";
 import React from 'react'
 import StartScreen from './components/StartScreen'
 import NFTCanvas from './components/NFTCanvas'
@@ -10,10 +11,9 @@ type NFTAppState = {
 
 export default function Page() {
   const [state, setState] = React.useState<NFTAppState>({ nfts: [], lastAddress: null })
-
-  // Simple in-app bridge to fetch NFTs via API route
   const [autoBanner, setAutoBanner] = React.useState<string | null>(null)
 
+  // Simple in-app bridge to fetch NFTs via API route
   const loadNFTs = async (address: string) => {
     try {
       const res = await fetch(`/api/nfts?address=${address}&provider=primary&chain=arbitrum`)

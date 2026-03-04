@@ -1,0 +1,49 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependency directories
+package-lock.json
+package-lock.json.lock
+pnpm-lock.yaml
+pnpm-lock.yaml.lock
+node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Local env files
+.env.local
+.env
+.env.*
+
+# OS / IDE files
+.DS_Store
+.vscode/
+.idea/
+
+# Coverage reports
+coverage/
+
+# Temporary files
+.cache/
+tmp/
+.tmp/
+*.tmp
+
+# Jest / testing
+jest.config.js
+jest.config.ts
+.jest/
+.nyc_output/
+
+# Cloudflare Pages (cache, if present locally)
+.cache-pages/

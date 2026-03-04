@@ -1,20 +1,23 @@
--# Flying NFTs Studio (Next.js + Tailwind)
+# Flying NFTs Studio (Next.js + Tailwind)
 
--This repository hosts a TypeScript Next.js app that renders NFT images as flying sprites on a canvas. Images come from on-chain NFT metadata for a given Arbitrum wallet.
+This repository hosts a TypeScript Next.js app that renders NFT images as flying sprites on a canvas. Images come from on-chain NFT metadata for a given Arbitrum wallet.
 
--What you get
+## What you get
 - Address-first NFT fetch using Cloudflare Pages Functions (edge) with a primary (Alchemy) and a secondary provider (Moralis).
 - LocalStorage persistence for NFTs, settings, and last-address.
 - Canvas-based animation with adjustable cap, speed, and size (default cap 100).
 - White background; no runtime theme switching for initial phase.
 - WalletConnect groundwork prepared for a future integration.
 
--Notes
+## Notes
 - All assets PNGs previously in the repo have been removed; NFT images come from metadata URLs.
 - Deployment targets Cloudflare Pages; ensure environment vars for ALCHEMY_API_KEY and MORALIS_API_KEY are configured in Pages.
 
--Usage
-- Run locally with dev server: npm run dev
+## Usage
+- Run locally with dev server: 
+```
+npm run dev
+```
 - Build for production: npm run build
 
 ## Local Development and Testing
@@ -40,8 +43,8 @@
 - Manually test the NFT flow:
   1. Launch the app in the browser
   2. Enter a wallet address (Arbitrum) on the Start screen
- 3. Click Load NFTs and observe the canvas animation with the flying NFT images loaded from metadata URLs
- 4. Use the Settings panel to adjust speed, size, and cap (up to 1000) and verify live updates
+  3. Click Load NFTs and observe the canvas animation with the flying NFT images loaded from metadata URLs
+  4. Use the Settings panel to adjust speed, size, and cap (up to 1000) and verify live updates
 - If a wallet address has no NFTs, the banner should reflect that and the canvas may show fewer sprites or none.
 
 ### Environment and deployment notes
@@ -49,24 +52,18 @@
 - The NFT data route is `/api/nfts` and is served via a Pages Function (edge) to keep keys secure and minimize latency.
 - Local development uses `.env.local` to provide keys; cloud deployment uses Page environment variables.
 
--Deployment on Cloudflare Pages
+### Deployment on Cloudflare Pages
 - Cloudflare Pages will host the Next.js app; NFT data requests go through a Pages Function at /api/nfts to keep keys secure.
 - Set environment variables for ALCHEMY_API_KEY and MORALIS_API_KEY in Pages.
 - Build command: npm run build; publish directory depends on your Pages configuration (often .next or out for static export).
 - Ensure edge function routing supports /api/nfts and returns NFT data quickly; consider short TTL caching for performance.
 
--Project overview
+### Project overview
 - Tech stack: TypeScript, Next.js app directory, TailwindCSS.
 - Data: NFTs owned by a wallet address on Arbitrum, fetched via edge API routes; image data comes from NFT metadata URLs.
 - UX: Canvas-based animation with configurable cap, speed, and size; white background; modern, minimal Settings Panel.
 - Deployment: Cloudflare Pages with edge functions for NFT data access.
 - Wallet-connect: scaffolding prepared for future integration behind ENABLE_WALLETCONNECT flag.
-- Local environment configuration
-- Create a local env file and copy keys from .env.example
-- The following keys are required for NFT data fetching:
-- ALCHEMY_API_KEY
-- MORALIS_API_KEY
-- If you don't have keys yet, you can still run the app; NFT fetches will fail gracefully and you can test other UI parts.
 
 ### Local environment configuration
 - Local development uses a .env.local file to override environment variables at runtime. Create:
@@ -76,9 +73,8 @@
 - Instead of committing secrets, keep .env.local in your gitignore.
 - For production deployment to Cloudflare Pages, environment variables are configured in the Pages dashboard and are not accessible from the client.
 
-## CI and Testing Guidance
-
-This project supports smoke testing in CI to confirm the app builds, runs, and responds to basic API requests. The smoke tests are designed to be CI-friendly and do not require real NFT API keys to run.
+### CI and Testing Guidance
+- This project supports smoke testing in CI to confirm the app builds, runs, and responds to basic API requests. The smoke tests are designed to be CI-friendly and do not require real NFT API keys to run.
 
 - Quick CI run locally (simulate CI):
   1) npm ci
@@ -110,3 +106,13 @@ jobs:
       - run: npm run test:smoke
       - run: pkill -f node
 ```
+## Local Development Helpers
+
+To simplify local setup, you can run the helper script that cleans dependencies, installs with legacy peer dependencies, and starts the dev server in the background.
+
+- Script: `scripts/setup-dev.sh`
+- Usage: `bash scripts/setup-dev.sh` (make it executable with `chmod +x scripts/setup-dev.sh` if you prefer `./scripts/setup-dev.sh`)
+- What it does:
+  - Removes `node_modules` for a clean slate
+  - Runs `npm install --legacy-peer-deps`
+  - Starts the Next.js dev server in the background

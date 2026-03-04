@@ -1,12 +1,25 @@
-export async function connectWallet(): Promise<string | null> {
-  try {
-    // Attempt dynamic import of WalletConnect v2 client if available in the environment
-    const mod = await import('@walletconnect/client')
-    // This is a scaffold; actual flow would involve creating a WCClient and requesting accounts
-    // For now, just indicate that the feature is not wired in this skeleton.
-    console.info('WalletConnect client loaded (skeleton).')
-    // Return null to indicate not connected yet in this skeleton
+// Gate flag for WalletConnect integration (default off for milestone)
+export const ENABLE_WALLETCONNECT = false
+
+// WalletConnect v2 integration skeleton (behind flag)
+export type WalletConnectSession = {
+  connected: boolean
+  accounts?: string[]
+  disconnect?: () => void
+}
+
+export async function initWalletConnect(): Promise<WalletConnectSession | null> {
+  if (!ENABLE_WALLETCONNECT) {
+    console.log('WalletConnect is disabled by feature flag.')
     return null
+  }
+  try {
+    // Attempt dynamic import of WalletConnect v2 client if installed
+    const wc = await import('@walletconnect/client')
+    // Minimal skeleton: in a real integration you'd initialize the client here
+    console.log('WalletConnect v2 skeleton loaded (client available).')
+    const session: WalletConnectSession = { connected: false, accounts: [] }
+    return session
   } catch {
     console.warn('WalletConnect library not available in this build.')
     return null
@@ -14,16 +27,6 @@ export async function connectWallet(): Promise<string | null> {
 }
 
 export function isWalletConnectAvailable(): boolean {
-  // Heuristic: if the module can be resolved, return true. This function is optional and safe.
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require.resolve('@walletconnect/client')
-    return true
-  } catch {
-    return false
-  }
+  // Availability relies on the optional dependency; default false in skeleton
+  return false
 }
-
-// Gate flag for WalletConnect integration (default off for milestone)
-// Gate flag for WalletConnect integration (default off for milestone)
-export const ENABLE_WALLETCONNECT = false
