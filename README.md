@@ -75,3 +75,38 @@
 - MORALIS_API_KEY=YOUR_MORALIS_API_KEY_HERE
 - Instead of committing secrets, keep .env.local in your gitignore.
 - For production deployment to Cloudflare Pages, environment variables are configured in the Pages dashboard and are not accessible from the client.
+
+## CI and Testing Guidance
+
+This project supports smoke testing in CI to confirm the app builds, runs, and responds to basic API requests. The smoke tests are designed to be CI-friendly and do not require real NFT API keys to run.
+
+- Quick CI run locally (simulate CI):
+  1) npm ci
+  2) npm run build
+  3) npm run start &
+  4) npm run test:smoke
+  5) pkill -f node
+- CI with real keys (optional):
+  - In CI, set secrets for ALCHEMY_API_KEY and MORALIS_API_KEY if you want to exercise real NFT fetches.
+  - Run steps 1-4; the tests will exercise missing-address (400) and missing-keys (500) paths when keys are absent.
+
+- CI workflow example (GitHub Actions) snippet (illustrative):
+```yaml
+name: CI
+on:
+  push:
+    branches: [ development, main ]
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run build
+      - run: npm run start &
+      - run: npm run test:smoke
+      - run: pkill -f node
+```
