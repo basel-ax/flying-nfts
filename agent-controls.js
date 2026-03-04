@@ -8,6 +8,7 @@
     height: 720,
     randomizeMode: false,
     randomizeN: 10,
+    whiteMode: false,
   };
 
   const STORAGE_KEYS = {
@@ -18,6 +19,7 @@
     autoload: "flying_autoload",
     randomizeMode: "flying_randomize_mode",
     randomizeN: "flying_randomize_n",
+    whiteMode: "flying_white_mode",
   };
 
   function clamp(n, min, max) {
@@ -92,6 +94,12 @@
         String(DEFAULTS.randomizeN),
       );
     }
+    if (localStorage.getItem(STORAGE_KEYS.whiteMode) === null) {
+      localStorage.setItem(
+        STORAGE_KEYS.whiteMode,
+        String(DEFAULTS.whiteMode),
+      );
+    }
   }
 
   function ensurePanel() {
@@ -132,6 +140,27 @@
           Auto-load last session
         </label>
         <button id="ag_reset_defaults">Reset to defaults</button>
+      </div>
+
+      <div style="margin-top:8px;">
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <input id="ag_white_mode" type="checkbox">
+          White mode
+        </label>
+      </div>
+
+      <div style="margin-top:10px;">
+        <button id="ag_start" style="
+          width:100%;
+          padding:8px 0;
+          font-size:14px;
+          font-weight:700;
+          cursor:pointer;
+          background:#0a84ff;
+          color:#fff;
+          border:none;
+          border-radius:6px;
+        ">Start</button>
       </div>
 
       <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.2); padding-top:8px;">
@@ -184,6 +213,9 @@
           DEFAULTS.randomizeMode ? "On" : "Off";
         document.getElementById("ag_randomize_n").value = DEFAULTS.randomizeN;
 
+        // Also reset white mode
+        document.getElementById("ag_white_mode").checked = DEFAULTS.whiteMode;
+
         if (typeof window.AGENT_setCanvasSize === "function")
           window.AGENT_setCanvasSize(w, h);
         if (typeof window.AGENT_setSpeed === "function")
@@ -194,6 +226,8 @@
           window.AGENT_setRandomizeMode(DEFAULTS.randomizeMode);
         if (typeof window.AGENT_setRandomizeN === "function")
           window.AGENT_setRandomizeN(DEFAULTS.randomizeN);
+        if (typeof window.AGENT_setWhiteMode === "function")
+          window.AGENT_setWhiteMode(DEFAULTS.whiteMode);
 
         localStorage.setItem(STORAGE_KEYS.width, String(w));
         localStorage.setItem(STORAGE_KEYS.height, String(h));
@@ -206,6 +240,10 @@
         localStorage.setItem(
           STORAGE_KEYS.randomizeN,
           String(DEFAULTS.randomizeN),
+        );
+        localStorage.setItem(
+          STORAGE_KEYS.whiteMode,
+          String(DEFAULTS.whiteMode),
         );
 
         const speedVal = document.getElementById("ag_speed_val");
@@ -228,6 +266,25 @@
       "ag_randomize_mode_label",
     );
     const randomizeNInput = document.getElementById("ag_randomize_n");
+    const startBtn = document.getElementById("ag_start");
+    const whiteModeInput = document.getElementById("ag_white_mode");
+
+    startBtn.addEventListener("click", () => {
+      if (typeof window.AGENT_startAnimation === "function") {
+        window.AGENT_startAnimation();
+        startBtn.textContent = "Running";
+        startBtn.disabled = true;
+        startBtn.style.background = "#333";
+        startBtn.style.cursor = "default";
+      }
+    });
+
+    whiteModeInput.addEventListener("change", () => {
+      const enabled = whiteModeInput.checked;
+      if (typeof window.AGENT_setWhiteMode === "function")
+        window.AGENT_setWhiteMode(enabled);
+      localStorage.setItem(STORAGE_KEYS.whiteMode, String(enabled));
+    });
 
     function updateDisplay() {
       speedVal.textContent = speedInput.value;
@@ -328,6 +385,10 @@
     }
     if (randomizeNInput) randomizeNInput.value = rN;
 
+    const wMode = readStoredBool(STORAGE_KEYS.whiteMode, DEFAULTS.whiteMode);
+    const whiteModeInput = document.getElementById("ag_white_mode");
+    if (whiteModeInput) whiteModeInput.checked = wMode;
+
     if (typeof window.AGENT_setSpeed === "function") window.AGENT_setSpeed(s);
     if (typeof window.AGENT_setCount === "function") window.AGENT_setCount(c);
     if (typeof window.AGENT_setCanvasSize === "function")
@@ -336,6 +397,8 @@
       window.AGENT_setRandomizeMode(rMode);
     if (typeof window.AGENT_setRandomizeN === "function")
       window.AGENT_setRandomizeN(rN);
+    if (typeof window.AGENT_setWhiteMode === "function")
+      window.AGENT_setWhiteMode(wMode);
 
     const speedVal = document.getElementById("ag_speed_val");
     const countVal = document.getElementById("ag_count_val");

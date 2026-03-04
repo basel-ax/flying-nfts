@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   autoload: "flying_autoload",
   randomizeMode: "flying_randomize_mode",
   randomizeN: "flying_randomize_n",
+  whiteMode: "flying_white_mode",
 };
 
 let speed = DEFAULTS.speed;
@@ -15,7 +16,37 @@ let windows = [];
 let windowsNum = DEFAULTS.count;
 let imgs = [];
 let paused = false;
+let started = false;
+let whiteMode = false;
 let config = { width: DEFAULTS.width, height: DEFAULTS.height };
+
+// Bright tint colors for dark background
+const TINT_COLORS = [
+  [255, 255, 255],   // white
+  [0, 174, 255],     // blue
+  [255, 69, 58],     // red
+  [50, 215, 75],     // green
+  [255, 214, 10],    // yellow
+  [191, 90, 242],    // purple
+  [100, 210, 255],   // light blue
+  [255, 159, 10],    // orange
+  [172, 142, 104],   // tan
+  [0, 199, 190],     // teal
+];
+
+// Dark tint colors for white background
+const DARK_TINT_COLORS = [
+  [0, 0, 0],         // black
+  [0, 80, 180],      // dark blue
+  [180, 30, 20],     // dark red
+  [20, 130, 40],     // dark green
+  [160, 120, 0],     // dark yellow
+  [100, 40, 160],    // dark purple
+  [0, 100, 160],     // dark cyan
+  [180, 90, 0],      // dark orange
+  [100, 70, 50],     // dark brown
+  [0, 120, 110],     // dark teal
+];
 
 // Randomize mode state
 let randomizeMode = false;
@@ -45,9 +76,13 @@ const ASSET_FILES = [
 
 function preload() {
   for (let i = 0; i < ASSET_FILES.length; i++) {
-    imgs[i] = loadImage("png/" + ASSET_FILES[i], null, () => {
-      console.warn("[flying-pngs] Failed to load asset: " + ASSET_FILES[i]);
-    });
+    imgs[i] = loadImage(
+      "png/" + ASSET_FILES[i],
+      function () {},
+      function () {
+        console.warn("[flying-pngs] Failed to load asset: " + ASSET_FILES[i]);
+      },
+    );
   }
 }
 
@@ -58,6 +93,7 @@ class Window {
     this.z = random(width);
     this.pz = this.z;
     this.img = random(imgs);
+    this.colorIndex = floor(random(TINT_COLORS.length));
   }
 
   update() {
@@ -77,7 +113,11 @@ class Window {
 
     let r = map(this.z, 0, width / 2, 26, 4);
 
+    const palette = whiteMode ? DARK_TINT_COLORS : TINT_COLORS;
+    const c = palette[this.colorIndex];
+    tint(c[0], c[1], c[2]);
     image(this.img, sx, sy, r, r);
+    noTint();
 
     this.pz = this.z;
   }
@@ -108,6 +148,10 @@ function setup() {
         localStorage.getItem(STORAGE_KEYS.randomizeN),
       );
       if (!Number.isNaN(savedRandN) && savedRandN > 0) randomizeN = savedRandN;
+
+      // White mode persistence
+      const savedWhiteMode = localStorage.getItem(STORAGE_KEYS.whiteMode);
+      if (savedWhiteMode !== null) whiteMode = savedWhiteMode === "true";
     }
   } catch (e) {
     // ignore storage errors
@@ -115,12 +159,29 @@ function setup() {
 
   createCanvas(config.width, config.height);
 
-  for (let i = 0; i < windowsNum; i++) {
-    windows[i] = new Window();
+  // Convert black silhouette PNGs to white so tint() can colorize them
+  for (let i = 0; i < imgs.length; i++) {
+    imgs[i].loadPixels();
+    for (let j = 0; j < imgs[i].pixels.length; j += 4) {
+      imgs[i].pixels[j] = 255;     // R
+      imgs[i].pixels[j + 1] = 255; // G
+      imgs[i].pixels[j + 2] = 255; // B
+      // keep alpha as-is
+    }
+    imgs[i].updatePixels();
   }
 
-  // Schedule the first randomize event
-  nextRandomizeTime = millis() + Math.random() * randomizeN * 1000;
+  // ── Start animation wrapper ────────────────────────────────────────────────
+
+  window.AGENT_startAnimation = function () {
+    if (started) return;
+    started = true;
+    windows = [];
+    for (let i = 0; i < windowsNum; i++) {
+      windows[i] = new Window();
+    }
+    nextRandomizeTime = millis() + Math.random() * randomizeN * 1000;
+  };
 
   // ── Agent setter wrappers ──────────────────────────────────────────────────
 
@@ -188,11 +249,26 @@ function setup() {
       nextRandomizeTime = millis() + Math.random() * randomizeN * 1000;
     }
   };
+
+  window.AGENT_setWhiteMode = function (enabled) {
+    whiteMode = !!enabled;
+    localStorage.setItem(STORAGE_KEYS.whiteMode, String(whiteMode));
+  };
 }
 
 function draw() {
-  background(0);
+  background(whiteMode ? 255 : 0);
   translate(width / 2, height / 2);
+
+  if (!started) {
+    push();
+    fill(whiteMode ? 0 : 255, whiteMode ? 0 : 255, whiteMode ? 0 : 255, 120);
+    textSize(18);
+    textAlign(CENTER, CENTER);
+    text("Set parameters and press Start", 0, 0);
+    pop();
+    return;
+  }
 
   // ── Randomize mode tick ───────────────────────────────────────────────────
   if (randomizeMode && !paused) {
@@ -218,7 +294,7 @@ function draw() {
     }
     // Pause indicator
     push();
-    fill(255);
+    fill(whiteMode ? 0 : 255);
     textSize(14);
     textAlign(RIGHT, BOTTOM);
     text("PAUSED (P)", width / 2 - 8, height / 2 - 8);
