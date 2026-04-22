@@ -1,0 +1,47 @@
+[
+  {
+    "id": "eth",
+    "name": "Ethereum",
+    "alchemyId": "eth",
+    "moralisId": "eth",
+    "chainId": "0x1",
+    "message": "Running on Ethereum mainnet",
+    "color": "#627EEA"
+  },
+  {
+    "id": "polygon",
+    "name": "Polygon",
+    "alchemyId": "polygon",
+    "moralisId": "polygon",
+    "chainId": "0x89",
+    "message": "Running on Polygon PoS",
+    "color": "#8247E5"
+  },
+  {
+    "id": "base",
+    "name": "Base",
+    "alchemyId": "base",
+    "moralisId": "base",
+    "chainId": "0x2105",
+    "message": "Running on Base",
+    "color": "#0052FF"
+  },
+  {
+    "id": "arb",
+    "name": "Arbitrum",
+    "alchemyId": "arb",
+    "moralisId": "arb",
+    "chainId": "0xa4b1",
+    "message": "Running on Arbitrum One",
+    "color": "#28A0F0"
+  },
+  {
+    "id": "optimism",
+    "name": "Optimism",
+    "alchemyId": "optimism",
+    "moralisId": "optimism",
+    "chainId": "0xa",
+    "message": "Running on Optimism",
+    "color": "#FF0420"
+  }
+]

@@ -5,3 +5,13 @@ export type NFTInfo = {
   imageUrl?: string
   metadataUrl?: string
 }
+
+export type BlockchainConfig = {
+  id: string
+  name: string
+  alchemyId: string
+  moralisId: string
+  chainId: string
+  message: string
+  color: string
+}

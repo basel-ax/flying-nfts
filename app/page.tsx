@@ -3,6 +3,7 @@ import React from 'react'
 import StartScreen from './components/StartScreen'
 import NFTCanvas from './components/NFTCanvas'
 import { NFTInfo } from './types'
+import { loadSelectedChain } from '../lib/storage'
 
 type NFTAppState = {
   nfts: NFTInfo[]
@@ -12,22 +13,31 @@ type NFTAppState = {
 export default function Page() {
   const [state, setState] = React.useState<NFTAppState>({ nfts: [], lastAddress: null })
   const [autoBanner, setAutoBanner] = React.useState<string | null>(null)
+  const [selectedChain, setSelectedChain] = React.useState<string>('arb')
 
-  // Simple in-app bridge to fetch NFTs via API route
-  const loadNFTs = async (address: string) => {
+  React.useEffect(() => {
+    const saved = loadSelectedChain()
+    if (saved) {
+      setSelectedChain(saved)
+    }
+  }, [])
+
+  const handleChainChange = (chainId: string) => {
+    setSelectedChain(chainId)
+  }
+
+  const loadNFTs = async (address: string, chain: string) => {
     try {
-      const res = await fetch(`/api/nfts?address=${address}&provider=primary&chain=arbitrum`)
+      const res = await fetch(`/api/nfts?address=${address}&provider=primary&chain=${chain}`)
       const data = await res.json()
       const nfts = data?.nfts ?? []
-      // Persist in localStorage and update state
       if (typeof window !== 'undefined') {
         localStorage.setItem('nftApp.nfts', JSON.stringify(nfts))
         localStorage.setItem('nftApp.lastAddress', address)
       }
       setState({ nfts, lastAddress: address })
-      // banner text with shortened address snippet
       const shortAddr = address.substring(0, 6)
-      const banner = nfts.length > 0 ? `Auto-loaded ${nfts.length} NFT(s) for address ${shortAddr}...` : `No NFTs found for address ${shortAddr}...`
+      const banner = nfts.length > 0 ? `Loaded ${nfts.length} NFT(s) from ${shortAddr}... on ${chain.toUpperCase()}` : `No NFTs found for address ${shortAddr}...`
       setAutoBanner(banner)
       return nfts
     } catch (e) {
@@ -53,16 +63,16 @@ export default function Page() {
   React.useEffect(() => {
     const addr = state.lastAddress
     if (addr && state.nfts.length === 0) {
-      const t = setTimeout(() => loadNFTs(addr), 500)
+      const t = setTimeout(() => loadNFTs(addr, selectedChain), 500)
       return () => clearTimeout(t)
     }
-  }, [state.lastAddress, state.nfts.length])
+  }, [state.lastAddress, state.nfts.length, selectedChain])
 
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 grid grid-cols-12">
         <div className="col-span-6 p-4">
-          <StartScreen onSubmit={loadNFTs} initialAddress={state.lastAddress ?? ''} autoBanner={autoBanner} />
+          <StartScreen onSubmit={loadNFTs} selectedChain={selectedChain} onChainChange={handleChainChange} initialAddress={state.lastAddress ?? ''} autoBanner={autoBanner} />
         </div>
         <div className="col-span-6 p-4">
           <NFTCanvas nftInfos={state.nfts} />

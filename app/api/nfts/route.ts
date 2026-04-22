@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { getBlockchainById } from '../../../lib/blockchains'
 
 export const runtime = 'edge'
 
@@ -14,7 +15,6 @@ type NFTInfo = {
 async function fetchFromAlchemy(address: string, chain: string): Promise<NFTInfo[]> {
   const key = process.env.ALCHEMY_API_KEY
   if (!key) throw new Error('Missing ALCHEMY_API_KEY')
-  // Arbitrum mainnet URL structure for Alchemy NFT API (adjust if needed)
   const base = `https://eth-${chain}.g.alchemy.com/v2/${key}`
   const url = `${base}/getNFTs?owner=${address}&withMetadata=true`
   const r = await fetch(url)
@@ -56,23 +56,24 @@ const cache: Map<string, CacheEntry> = new Map()
 export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const address = url.searchParams.get('address')?.trim() ?? ''
-  const chain = url.searchParams.get('chain')?.trim() ?? 'arb'
+  const chainParam = url.searchParams.get('chain')?.trim() ?? 'arb'
+  const chainConfig = getBlockchainById(chainParam)
+  const resolvedChain = chainConfig?.alchemyId ?? chainParam
   const provider = (url.searchParams.get('provider') ?? 'primary').toString()
   if (!address) {
     return NextResponse.json({ error: 'address is required' }, { status: 400 })
   }
   try {
-    const cacheKey = `${address}|${chain}`
+    const cacheKey = `${address}|${chainParam}`
     const cached = cache.get(cacheKey)
     if (cached && Date.now() - cached.t < 60000) {
       return NextResponse.json({ nfts: cached.nfts })
     }
     let nfts: NFTInfo[] = []
     try {
-      nfts = await fetchFromAlchemy(address, chain)
+      nfts = await fetchFromAlchemy(address, resolvedChain)
     } catch {
-      // fallback
-      nfts = await fetchFromMoralis(address, chain)
+      nfts = await fetchFromMoralis(address, chainConfig?.moralisId ?? chainParam)
     }
     // Normalize
     const simplified = nfts.map((n) => ({

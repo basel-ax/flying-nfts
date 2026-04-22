@@ -33,3 +33,11 @@ export function saveLastAddress(addr: string) {
 export function loadLastAddress(): string | null {
   return localStorage.getItem('nftApp.lastAddress')
 }
+
+export function saveSelectedChain(id: string) {
+  localStorage.setItem('nftApp.selectedChain', id)
+}
+
+export function loadSelectedChain(): string | null {
+  return localStorage.getItem('nftApp.selectedChain')
+}

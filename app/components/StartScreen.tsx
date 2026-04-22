@@ -1,18 +1,38 @@
 import React from 'react'
 import { NFTInfo } from '../types'
 import SettingsPanel from './SettingsPanel'
+import ChainSelector from './ChainSelector'
+import Footer from './Footer'
 import { ENABLE_WALLETCONNECT, createWalletConnectSession, MOCK_WALLETCONNECT } from '../../lib/walletconnect'
+import { saveSelectedChain, loadSelectedChain } from '../../lib/storage'
 
 type Props = {
-  onSubmit: (address: string) => Promise<NFTInfo[]>
+  onSubmit: (address: string, chain: string) => Promise<NFTInfo[]>
+  selectedChain: string
+  onChainChange: (chainId: string) => void
   initialAddress?: string
   autoBanner?: string | null
 }
 
-export default function StartScreen({ onSubmit, initialAddress = '', autoBanner = null }: Props) {
+export default function StartScreen({ onSubmit, selectedChain, onChainChange, initialAddress = '', autoBanner = null }: Props) {
   const [address, setAddress] = React.useState<string>(initialAddress)
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [chain, setChain] = React.useState<string>(selectedChain)
+
+  React.useEffect(() => {
+    const saved = loadSelectedChain()
+    if (saved) {
+      setChain(saved)
+      onChainChange(saved)
+    }
+  }, [])
+
+  const handleChainChange = (chainId: string) => {
+    setChain(chainId)
+    saveSelectedChain(chainId)
+    onChainChange(chainId)
+  }
 
   const submit = async () => {
     setError(null)
@@ -22,7 +42,7 @@ export default function StartScreen({ onSubmit, initialAddress = '', autoBanner 
     }
     setLoading(true)
     try {
-      await onSubmit(address)
+      await onSubmit(address, chain)
     } catch (e) {
       setError('Failed to load NFTs')
     } finally {
@@ -48,7 +68,7 @@ export default function StartScreen({ onSubmit, initialAddress = '', autoBanner 
             await fetch('/api/wallet-connect', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ address: demoAddress, chain: 'arb' }),
+              body: JSON.stringify({ address: demoAddress, chain: chain }),
             })
           } catch {
             // ignore
@@ -60,19 +80,16 @@ export default function StartScreen({ onSubmit, initialAddress = '', autoBanner 
         return
       }
       if (res.address) {
-        // Persist session via edge API route (session management on edge)
         try {
           await fetch('/api/wallet-connect', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address: res.address, chain: 'arb' }),
+            body: JSON.stringify({ address: res.address, chain: chain }),
           })
         } catch {
           // Non-fatal: continue with UI flow even if edge route is unavailable
         }
-        // Autofill the connected address to proceed with NFT loading
         setAddress(res.address)
-        // Auto-submit to load NFTs
         await submit()
         return
       }
@@ -101,7 +118,7 @@ export default function StartScreen({ onSubmit, initialAddress = '', autoBanner 
       await fetch('/api/wallet-connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: addr, chain: 'arb' }),
+        body: JSON.stringify({ address: addr, chain: chain }),
       })
     } catch {
       // ignore
@@ -118,7 +135,8 @@ export default function StartScreen({ onSubmit, initialAddress = '', autoBanner 
       )}
       <h1 className="text-2xl font-semibold mb-4">NFT Flying Studio</h1>
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700">Wallet Address (Arbitrum)</label>
+        <ChainSelector selectedChain={chain} onChange={handleChainChange} />
+        <label className="block text-sm font-medium text-gray-700">Wallet Address</label>
         <input
           value={address}
           onChange={(e) => setAddress(e.target.value)}
@@ -177,6 +195,7 @@ export default function StartScreen({ onSubmit, initialAddress = '', autoBanner 
       <div className="mt-6">
         <SettingsPanel />
       </div>
+      <Footer />
     </div>
   )
 }
