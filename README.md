@@ -26,6 +26,14 @@ npm run dev
 - Node.js 18+ (LTS)
 - npm or yarn
 
+## Node.js version management (nvm)
+- This project requires Node.js version 18 or newer. If you manage multiple Node versions, use nvm:
+- Install and switch to Node 18 with:
+  - nvm install 18
+  - nvm use 18
+  - nvm alias default 18
+- Verify: node -v should show something like v18.x.x
+
 ### Setup local environment
 - Install dependencies: `npm install`
 - Create local environment variables in a `.env.local` file (this is for local development; Cloudflare Pages will provide keys in the edge environment):
@@ -34,12 +42,12 @@ npm run dev
 - If you don't have API keys yet, you can still run the app; NFT fetches will fail gracefully and you can test other UI parts.
 
 ### Run locally
-- Start the dev server: `npm run dev`
+- Start the dev server: `npm run dev` (uses Webpack on ARM64 platforms where Turbopack native bindings are unavailable)
 - Open in your browser: http://localhost:3000
 - The app uses the app directory structure and TailwindCSS for styling; changes hot-reload automatically.
 
 ### Test API and UI locally
-- Smoke test for API: `npm run test:smoke` (requires the server to be up; checks missing-address path)
+- Smoke test for API: `npm run test:smoke` (requires the server to be up; checks missing-address path and API key handling)
 - Manually test the NFT flow:
   1. Launch the app in the browser
   2. Enter a wallet address (Arbitrum) on the Start screen
@@ -47,10 +55,17 @@ npm run dev
   4. Use the Settings panel to adjust speed, size, and cap (up to 1000) and verify live updates
 - If a wallet address has no NFTs, the banner should reflect that and the canvas may show fewer sprites or none.
 
+### Known issues & fixes applied
+- **Node.js version**: Project requires Node 18+ (relaxed from >=22.0.0 to work with v20)
+- **Turbopack on ARM64**: Dev server uses `--webpack` flag automatically for compatibility
+- **Optional dependencies**: `@walletconnect/client` and `node-fetch` are optional dev dependencies
+- **File permissions**: Fixed on `node_modules/.bin/*` executables
+
 ### Environment and deployment notes
 - For Cloudflare Pages deployment, environment variables are configured on the Pages dashboard (ALCHEMY_API_KEY, MORALIS_API_KEY).
 - The NFT data route is `/api/nfts` and is served via a Pages Function (edge) to keep keys secure and minimize latency.
 - Local development uses `.env.local` to provide keys; cloud deployment uses Page environment variables.
+- Ensure edge function routing supports `/api/nfts` and returns NFT data quickly; consider short TTL caching for performance.
 
 ### Deployment on Cloudflare Pages
 - Cloudflare Pages will host the Next.js app; NFT data requests go through a Pages Function at /api/nfts to keep keys secure.
