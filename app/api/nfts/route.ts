@@ -17,7 +17,7 @@ async function fetchFromAlchemy(address: string, chain: string): Promise<NFTInfo
   // Arbitrum mainnet URL structure for Alchemy NFT API (adjust if needed)
   const base = `https://eth-${chain}.g.alchemy.com/v2/${key}`
   const url = `${base}/getNFTs?owner=${address}&withMetadata=true`
-  const r = await fetch(url, { cf: { cacheEverything: true } as any })
+  const r = await fetch(url)
   if (!r.ok) throw new Error(`Alchemy NFT fetch failed: ${r.status}`)
   const data = await r.json()
   const items = (data?.ownedNfts ?? []) as any[]

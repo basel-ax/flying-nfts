@@ -46,7 +46,7 @@ export default class CanvasEngine {
         s.rotationSpeed = (Math.random() - 0.5) * 0.02
         return s
       })
-      .filter((s) => !!s.image?.src || s.imageUrl?.length || s.image?.src !== '')
+      .filter((s) => !!s.image?.src && s.image.src !== '')
     // enforce cap after refresh
     if (this.sprites.length > this.cap) {
       this.sprites.length = this.cap
