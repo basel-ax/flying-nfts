@@ -1,4 +1,5 @@
 import '../styles/globals.css'
+import MarqueeFooter from './components/MarqueeFooter'
 
 export const metadata = {
   title: 'Flying NFTs Studio',
@@ -12,7 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <MarqueeFooter />
+      </body>
     </html>
   )
 }

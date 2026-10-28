@@ -127,27 +127,29 @@ export default function StartScreen({ onSubmit, selectedChain, onChainChange, in
   }
 
   return (
-    <div className="bg-white rounded shadow p-6 h-full flex flex-col justify-center">
+    <div className="surface-dark rounded p-6 h-full flex flex-col justify-center neon-border">
       {autoBanner && (
-        <div className="mb-4 rounded border border-blue-200 bg-blue-50 text-blue-800 px-3 py-2 text-sm" role="status">
+        <div className="mb-4 rounded border px-3 py-2 text-sm neon-border-pink" style={{borderColor: 'var(--cyberpunk-pink)', backgroundColor: 'var(--cyberpunk-surface-light)', color: 'var(--cyberpunk-pink)'}} role="status">
           {autoBanner}
         </div>
       )}
-      <h1 className="text-2xl font-semibold mb-4">NFT Flying Studio</h1>
+      <h1 className="text-2xl font-semibold mb-4 neon-glow-text" style={{color: 'var(--cyberpunk-cyan)'}}>NFT Flying Studio</h1>
       <div className="space-y-4">
         <ChainSelector selectedChain={chain} onChange={handleChainChange} />
-        <label className="block text-sm font-medium text-gray-700">Wallet Address</label>
+        <label className="block text-sm font-medium" style={{color: 'var(--cyberpunk-text-muted)'}}>Wallet Address</label>
         <input
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           placeholder="0x..."
-          className="w-full border border-gray-300 rounded px-3 py-2"
+          className="w-full rounded px-3 py-2 transition-all duration-200"
+          style={{backgroundColor: 'var(--cyberpunk-surface-light)', color: 'var(--cyberpunk-text)', border: '1px solid var(--cyberpunk-border)'}}
         />
-        {error && <div className="text-red-600 text-sm">{error}</div>}
+        {error && <div className="text-sm font-medium" style={{color: 'var(--cyberpunk-red)'}}>{error}</div>}
         {wcAvailable && (
           <button
-            className="mb-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="mb-2 px-4 py-2 rounded transition-all duration-200 hover:scale-105"
             onClick={handleWC}
+          style={{backgroundColor: 'var(--cyberpunk-green)', color: '#000'}}
           >
             Connect Wallet (WalletConnect v2)
           </button>
@@ -186,8 +188,9 @@ export default function StartScreen({ onSubmit, selectedChain, onChainChange, in
       )}
         <button
           onClick={submit}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2 rounded transition-all duration-200 hover:scale-105 disabled:opacity-50"
           disabled={loading}
+          style={{backgroundColor: 'var(--cyberpunk-cyan)', color: '#000'}}
         >
           {loading ? 'Loading...' : 'Load NFTs'}
         </button>
@@ -195,7 +198,6 @@ export default function StartScreen({ onSubmit, selectedChain, onChainChange, in
       <div className="mt-6">
         <SettingsPanel />
       </div>
-      <Footer />
     </div>
   )
 }

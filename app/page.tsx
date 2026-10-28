@@ -69,7 +69,7 @@ export default function Page() {
   }, [state.lastAddress, state.nfts.length, selectedChain])
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{backgroundColor: 'var(--cyberpunk-bg)'}}>
       <div className="flex-1 grid grid-cols-12">
         <div className="col-span-6 p-4">
           <StartScreen onSubmit={loadNFTs} selectedChain={selectedChain} onChainChange={handleChainChange} initialAddress={state.lastAddress ?? ''} autoBanner={autoBanner} />

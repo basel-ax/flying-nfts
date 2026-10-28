@@ -12,11 +12,12 @@ export default function ChainSelector({ selectedChain, onChange }: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      <label className="text-sm font-medium text-gray-700">Network</label>
+      <label className="text-sm font-medium" style={{color: 'var(--cyberpunk-text-muted)'}}>Network</label>
       <select
         value={selectedChain}
         onChange={(e) => onChange(e.target.value)}
-        className="border border-gray-300 rounded px-2 py-1 text-sm bg-white"
+        className="rounded px-2 py-1 text-sm transition-all duration-200"
+        style={{backgroundColor: 'var(--cyberpunk-surface-light)', color: 'var(--cyberpunk-text)', border: '1px solid var(--cyberpunk-border)'}}
       >
         {configs.map((config: BlockchainConfig) => (
           <option key={config.id} value={config.id}>

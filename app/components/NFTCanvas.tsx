@@ -48,7 +48,7 @@ export default function NFTCanvas({ nftInfos }: Props) {
   }, [nftInfos])
 
   return (
-    <div className="w-full h-full bg-white border rounded">
+    <div className="w-full h-full rounded neon-border" style={{backgroundColor: 'var(--cyberpunk-surface)'}}>
       <canvas ref={canvasRef} className="canvas-container w-full h-full" />
     </div>
   )

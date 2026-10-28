@@ -36,38 +36,35 @@ export default function SettingsPanel() {
   }
 
   return (
-    <div className="bg-gray-50 p-4 rounded border">
-      <div className="mb-2 font-semibold">Settings</div>
+    <div className="p-4 rounded neon-border" style={{backgroundColor: 'var(--cyberpunk-surface)'}}>
+      <div className="mb-2 font-semibold neon-glow-text-sm" style={{color: 'var(--cyberpunk-cyan)'}}>Settings</div>
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm">Speed</label>
-          <input type="range" min={0.1} max={3} step={0.1} value={settings.speed}
-            onChange={(e) => setSettings({ ...settings, speed: parseFloat(e.target.value) })}
-            className="w-full" />
-          <div className="text-sm text-gray-600">{settings.speed.toFixed(1)}x</div>
-        </div>
-        <div>
-          <label className="block text-sm">NFT Size</label>
-          <input type="range" min={0.5} max={2.0} step={0.1} value={settings.size}
-            onChange={(e) => setSettings({ ...settings, size: parseFloat(e.target.value) })}
-            className="w-full" />
-          <div className="text-sm text-gray-600">{settings.size.toFixed(1)}x</div>
-        </div>
-        <div>
-          <label className="block text-sm">Cap</label>
-          <input type="range" min={10} max={1000} step={10} value={settings.cap}
-            onChange={(e) => setSettings({ ...settings, cap: parseInt(e.target.value) })}
-            className="w-full" />
-          <div className="text-sm text-gray-600">{settings.cap} NFTs</div>
-        </div>
-        <div>
-          <label className="block text-sm">Background</label>
-          <div className="text-sm text-gray-600">White (fixed)</div>
-        </div>
+<div>
+           <label className="block text-sm" style={{color: 'var(--cyberpunk-text-muted)'}}>Speed</label>
+           <input type="range" min={0.1} max={3} step={0.1} value={settings.speed}
+             onChange={(e) => setSettings({ ...settings, speed: parseFloat(e.target.value) })}
+             className="w-full" />
+           <div className="text-sm" style={{color: 'var(--cyberpunk-cyan)'}}>{settings.speed.toFixed(1)}x</div>
+         </div>
+         <div>
+           <label className="block text-sm" style={{color: 'var(--cyberpunk-text-muted)'}}>NFT Size</label>
+           <input type="range" min={0.5} max={2.0} step={0.1} value={settings.size}
+             onChange={(e) => setSettings({ ...settings, size: parseFloat(e.target.value) })}
+             className="w-full" />
+           <div className="text-sm" style={{color: 'var(--cyberpunk-cyan)'}}>{settings.size.toFixed(1)}x</div>
+         </div>
+         <div>
+           <label className="block text-sm" style={{color: 'var(--cyberpunk-text-muted)'}}>Cap</label>
+           <input type="range" min={10} max={1000} step={10} value={settings.cap}
+             onChange={(e) => setSettings({ ...settings, cap: parseInt(e.target.value) })}
+             className="w-full" />
+           <div className="text-sm" style={{color: 'var(--cyberpunk-cyan)'}}>{settings.cap} NFTs</div>
+         </div>
       </div>
       <div className="mt-3 flex gap-2">
-        <button
-          className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+<button
+           className="px-3 py-2 rounded transition-all duration-200 hover:scale-105"
+           style={{backgroundColor: 'var(--cyberpunk-cyan)', color: '#000'}}
           onClick={() => {
             const detail = {
               speed: settings.speed,
@@ -80,7 +77,7 @@ export default function SettingsPanel() {
             window.dispatchEvent(new CustomEvent('settings-update', { detail }))
           }}
         >Apply</button>
-        <button className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300" onClick={reset}>Reset</button>
+        <button className="px-3 py-2 rounded transition-all duration-200 hover:scale-105" style={{backgroundColor: 'var(--cyberpunk-border)', color: 'var(--cyberpunk-text)'}} onClick={reset}>Reset</button>
       </div>
     </div>
   )
